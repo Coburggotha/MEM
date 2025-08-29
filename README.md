@@ -1,3 +1,87 @@
+### 방향키 입력에 따라 출력 해주는 프로그램
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <conio.h>
+
+int main(void)
+{
+    clock_t initial_clock = clock();   // 초기 clock 설정
+    int i = 1;
+    int go = 1;
+
+    system("cls"); //
+    printf("%d ", i); // 정수 출력, 변수 I를
+
+    while (i < 100)   // 변수 i 가 100보다 작을때 까지 반복
+    {
+        if (go == 1) // go 가 1과 같으면 
+        {
+            clock_t current_clock = clock();   // 현재 clock
+            if (current_clock - initial_clock >= 1000)   // 1초 경과
+            {
+                i++;
+                system("cls");
+                printf("%d ", i);
+                initial_clock = clock();   // 현재 clock을 초기 clock으로 대입
+            }
+        }
+       if (_kbhit())   // 키 입력이 있었다면
+        {
+            if (_getch() == 'p')   // 'p' 키라면
+                go = (go + 1) % 2;   // 멈춤(0)/재개(1) 변환
+        }
+    }
+}
+
+//#define KEY_ESC 27 // KEY_ESC를 27로 고정
+//#define KEY_UP (256 + 72) // 
+//#define KEY_DOWN (256 + 80)
+//#define KEY_LEFT (256 + 75)
+//#define KEY_RIGHT (256 + 77)
+//
+//int Getkey(void) // 반환 없는 Getkey 변수 선
+//{
+//	int ch = _getch();
+//
+//	if (ch == 0 || ch == 224);
+//	// 방향키의 경우 0 또는 224의 값이 먼저 입력됨
+//	ch = 256 + _getch();
+//	// 그 다음에 해당 방향키에 따라 72(Up),
+//	// 80(Down), 75(Left), 77(Right) 값이 입력됨
+//
+//	return ch;
+//}
+//
+//int main(void)
+//{
+//		int ch;
+//	while ((ch = Getkey()) != KEY_ESC)
+//	{
+//		switch (ch)
+//		{
+//		case KEY_RIGHT:
+//			printf("[Key Right]\n");
+//			break;
+//
+//		case KEY_LEFT:
+//				printf("[Key Left]\n");
+//				break;
+//		case KEY_UP:
+//					printf("[Key Up]\n");
+//					break;
+//		case KEY_DOWN:
+//						printf("[Key Down]\n");
+//						break;
+//		}
+//	}
+//
+//}
+ ```
+ 
+
+ 
  // 1. ======== 파일 생성 추가 ========
  const char* memFile = "output_image.mem";  // MEM 파일 이름 추가
  FILE* memOutFile = NULL;  // MEM 파일 포인터 추가
@@ -84,4 +168,12 @@ void findEdges(unsigned char* input, unsigned char* output, int width, int heigh
         }
     }
 }
+```
+
+### 소벨 필터 전체 코드
+```
+
+
+
+
 ```
