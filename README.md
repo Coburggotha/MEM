@@ -30,5 +30,10 @@ C:\Users\62>fc image_data.mem image_data2.mem
 
 
 
+
+
+
 소벨 필터 적용 이미지
 ![output_edge.bmp](https://github.com/user-attachments/files/22039110/output_edge.bmp)
+
+소벨 필터 코드
