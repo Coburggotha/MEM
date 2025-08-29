@@ -41,7 +41,7 @@ C:\Users\62>fc image_data.mem image_data2.mem
 ![output_edge.bmp](https://github.com/user-attachments/files/22039110/output_edge.bmp)
 
 
-
+```
 소벨 필터 코드를 BMP to Gray 코드에 추가
 
 // 소벨 필터
@@ -84,3 +84,4 @@ void findEdges(unsigned char* input, unsigned char* output, int width, int heigh
         }
     }
 }
+```
