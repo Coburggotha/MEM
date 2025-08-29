@@ -1,30 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <math.h>   // sqrt »ç¿ë (¼Òº§ ÄÚµå¿¡ ÇÊ¿ä)
 
-// BMP ÆÄÀÏ Çì´õ ±¸Á¶Ã¼
+// BMP íŒŒì¼ í—¤ë” êµ¬ì¡°ì²´
 #pragma pack(push, 1)
 typedef struct {
-    uint16_t type;        // ÆÄÀÏ Çü½Ä (BM)
-    uint32_t size;        // ÆÄÀÏ Å©±â
-    uint16_t reserved1;   // ¿¹¾àµÈ ÇÊµå
-    uint16_t reserved2;   // ¿¹¾àµÈ ÇÊµå
-    uint32_t offset;      // ÀÌ¹ÌÁö µ¥ÀÌÅÍ ½ÃÀÛ À§Ä¡
+    uint16_t type;        // íŒŒì¼ í˜•ì‹ (BM)
+    uint32_t size;        // íŒŒì¼ í¬ê¸°
+    uint16_t reserved1;   // ì˜ˆì•½ëœ í•„ë“œ
+    uint16_t reserved2;   // ì˜ˆì•½ëœ í•„ë“œ
+    uint32_t offset;      // ì´ë¯¸ì§€ ë°ì´í„° ì‹œì‘ ìœ„ì¹˜
 } BMPFileHeader;
 
 typedef struct {
-    uint32_t size;        // Çì´õ Å©±â
-    int32_t width;        // ÀÌ¹ÌÁö ³Êºñ
-    int32_t height;       // ÀÌ¹ÌÁö ³ôÀÌ
-    uint16_t planes;      // »ö»ó Æò¸é ¼ö
-    uint16_t bitCount;    // ÇÈ¼¿´ç ºñÆ® ¼ö
-    uint32_t compression; // ¾ĞÃà Çü½Ä
-    uint32_t sizeImage;   // ÀÌ¹ÌÁö µ¥ÀÌÅÍ Å©±â
-    int32_t xPelsPerMeter;// ¼öÆò ÇØ»óµµ
-    int32_t yPelsPerMeter;// ¼öÁ÷ ÇØ»óµµ
-    uint32_t clrUsed;     // »ç¿ëµÈ »ö»ó ¼ö
-    uint32_t clrImportant;// Áß¿äÇÑ »ö»ó ¼ö
+    uint32_t size;        // í—¤ë” í¬ê¸°
+    int32_t width;        // ì´ë¯¸ì§€ ë„ˆë¹„
+    int32_t height;       // ì´ë¯¸ì§€ ë†’ì´
+    uint16_t planes;      // ìƒ‰ìƒ í‰ë©´ ìˆ˜
+    uint16_t bitCount;    // í”½ì…€ë‹¹ ë¹„íŠ¸ ìˆ˜
+    uint32_t compression; // ì••ì¶• í˜•ì‹
+    uint32_t sizeImage;   // ì´ë¯¸ì§€ ë°ì´í„° í¬ê¸°
+    int32_t xPelsPerMeter;// ìˆ˜í‰ í•´ìƒë„
+    int32_t yPelsPerMeter;// ìˆ˜ì§ í•´ìƒë„
+    uint32_t clrUsed;     // ì‚¬ìš©ëœ ìƒ‰ìƒ ìˆ˜
+    uint32_t clrImportant;// ì¤‘ìš”í•œ ìƒ‰ìƒ ìˆ˜
 } BMPInfoHeader;
 
 typedef struct {
@@ -34,14 +33,13 @@ typedef struct {
 } RGB;
 #pragma pack(pop)
 
-// RGB¸¦ ±×·¹ÀÌ½ºÄÉÀÏ·Î º¯È¯ÇÏ´Â ÇÔ¼ö
+// RGBë¥¼ ê·¸ë ˆì´ìŠ¤ì¼€ì¼ë¡œ ë³€í™˜í•˜ëŠ” í•¨ìˆ˜
 uint8_t rgbToGrayscale(RGB pixel) {
-    // Ç¥ÁØ luminance °ø½Ä: Y = 0.299*R + 0.587*G + 0.114*B
+    // í‘œì¤€ luminance ê³µì‹: Y = 0.299*R + 0.587*G + 0.114*B
     return (uint8_t)(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue);
 }
 
-/* -------------------- ¼Òº§ ÇÊÅÍ (´ç½ÅÀÌ º¸³½ ÄÚµå ±×´ë·Î) -------------------- */
-// ¼Òº§ ÇÊÅÍ
+// ì†Œë²¨ í•„í„°
 int sobelX[3][3] = {
     {-1, 0, 1},
     {-2, 0, 2},
@@ -52,7 +50,7 @@ int sobelY[3][3] = {
     { 0,  0,  0},
     { 1,  2,  1}
 };
-// ¾ÈÀüÇÏ°Ô ÇÈ¼¿ °ª °¡Á®¿À±â
+// ì•ˆì „í•˜ê²Œ í”½ì…€ ê°’ ê°€ì ¸ì˜¤ê¸°
 unsigned char getPixel(unsigned char* image, int width, int height, int x, int y) {
     if (x < 0) x = 0;
     if (x >= width) x = width - 1;
@@ -60,13 +58,13 @@ unsigned char getPixel(unsigned char* image, int width, int height, int x, int y
     if (y >= height) y = height - 1;
     return image[y * width + x];
 }
-// ¼Òº§ ÇÊÅÍ·Î ¿§Áö Ã£±â
+// ì†Œë²¨ í•„í„°ë¡œ ì—£ì§€ ì°¾ê¸°
 void findEdges(unsigned char* input, unsigned char* output, int width, int height) {
-    printf("¿§Áö °ËÃâ Áß...\n");
+    printf("ì—£ì§€ ê²€ì¶œ ì¤‘...\n");
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             int gx = 0, gy = 0;
-            // ÁÖº¯ 9°³ ÇÈ¼¿¿¡ ÇÊÅÍ Àû¿ë
+            // ì£¼ë³€ 9ê°œ í”½ì…€ì— í•„í„° ì ìš©
             for (int i = -1; i <= 1; i++) {
                 for (int j = -1; j <= 1; j++) {
                     unsigned char pixel = getPixel(input, width, height, x + j, y + i);
@@ -74,96 +72,95 @@ void findEdges(unsigned char* input, unsigned char* output, int width, int heigh
                     gy += pixel * sobelY[i + 1][j + 1];
                 }
             }
-            // ¿§Áö °­µµ °è»ê
+            // ì—£ì§€ ê°•ë„ ê³„ì‚°
             int edge = (int)sqrt(gx * gx + gy * gy);
             if (edge > 255) edge = 255;
             output[y * width + x] = (unsigned char)edge;
         }
     }
 }
-/* ------------------------------------------------------------------------- */
 
 int main() {
     const char* inputFile = "brainct_001.bmp";
     const char* outputFile = "output_grayscale.bmp";
-    const char* edgeFile = "output_edge.bmp";     // (Ãß°¡) ¿§Áö BMP
-    const char* memFile = "output_image.mem";    // (¹®±¸¿¡¸¸ »ç¿ë)
+    const char* edgeFile = "output_edge.bmp";     // (ì¶”ê°€) ì—£ì§€ BMP
+    const char* memFile = "output_image.mem";    // (ë¬¸êµ¬ì—ë§Œ ì‚¬ìš©)
 
     const int IMAGE_WIDTH = 630;
     const int IMAGE_HEIGHT = 630;
 
     FILE* inFile = NULL;
     FILE* outFile = NULL;
-    FILE* edgeOutFile = NULL;    // (Ãß°¡) ¿§Áö BMP ÆÄÀÏ Æ÷ÀÎÅÍ
-    FILE* memOutFile = NULL;     // (¼±¾ğ¸¸ À¯Áö)
+    FILE* edgeOutFile = NULL;    // (ì¶”ê°€) ì—£ì§€ BMP íŒŒì¼ í¬ì¸í„°
+    FILE* memOutFile = NULL;     // (ì„ ì–¸ë§Œ ìœ ì§€)
 
-    // ÀÔ·Â ÆÄÀÏ ¿­±â
+    // ì…ë ¥ íŒŒì¼ ì—´ê¸°
     if (fopen_s(&inFile, inputFile, "rb") != 0 || inFile == NULL) {
-        printf("ÀÔ·Â ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: %s\n", inputFile);
+        printf("ì…ë ¥ íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: %s\n", inputFile);
         return 1;
     }
 
-    // BMP Çì´õ ÀĞ±â
+    // BMP í—¤ë” ì½ê¸°
     BMPFileHeader fileHeader;
     BMPInfoHeader infoHeader;
 
     fread(&fileHeader, sizeof(BMPFileHeader), 1, inFile);
     fread(&infoHeader, sizeof(BMPInfoHeader), 1, inFile);
 
-    // BMP ÆÄÀÏ Çü½Ä °ËÁõ
+    // BMP íŒŒì¼ í˜•ì‹ ê²€ì¦
     if (fileHeader.type != 0x4D42) { // "BM"
-        printf("À¯È¿ÇÏÁö ¾ÊÀº BMP ÆÄÀÏÀÔ´Ï´Ù.\n");
+        printf("ìœ íš¨í•˜ì§€ ì•Šì€ BMP íŒŒì¼ì…ë‹ˆë‹¤.\n");
         fclose(inFile);
         return 1;
     }
 
     if (infoHeader.bitCount != 24) {
-        printf("24ºñÆ® BMP ÆÄÀÏÀÌ ¾Æ´Õ´Ï´Ù. (ÇöÀç: %dºñÆ®)\n", infoHeader.bitCount);
+        printf("24ë¹„íŠ¸ BMP íŒŒì¼ì´ ì•„ë‹™ë‹ˆë‹¤. (í˜„ì¬: %dë¹„íŠ¸)\n", infoHeader.bitCount);
         fclose(inFile);
         return 1;
     }
 
     if (infoHeader.width != IMAGE_WIDTH || infoHeader.height != IMAGE_HEIGHT) {
-        printf("ÀÌ¹ÌÁö Å©±â°¡ %dx%d°¡ ¾Æ´Õ´Ï´Ù. (ÇöÀç: %dx%d)\n",
+        printf("ì´ë¯¸ì§€ í¬ê¸°ê°€ %dx%dê°€ ì•„ë‹™ë‹ˆë‹¤. (í˜„ì¬: %dx%d)\n",
             IMAGE_WIDTH, IMAGE_HEIGHT, infoHeader.width, infoHeader.height);
         fclose(inFile);
         return 1;
     }
 
-    printf("ÀÔ·Â ÆÄÀÏ Á¤º¸:\n");
-    printf("- Å©±â: %dx%d\n", infoHeader.width, infoHeader.height);
-    printf("- ºñÆ® ¼ö: %d\n", infoHeader.bitCount);
-    printf("- ÆÄÀÏ Å©±â: %u bytes\n", fileHeader.size);
+    printf("ì…ë ¥ íŒŒì¼ ì •ë³´:\n");
+    printf("- í¬ê¸°: %dx%d\n", infoHeader.width, infoHeader.height);
+    printf("- ë¹„íŠ¸ ìˆ˜: %d\n", infoHeader.bitCount);
+    printf("- íŒŒì¼ í¬ê¸°: %u bytes\n", fileHeader.size);
 
-    // ÆĞµù °è»ê (BMP´Â °¢ ÇàÀÌ 4¹ÙÀÌÆ® °æ°è¿¡ Á¤·ÄµÇ¾î¾ß ÇÔ)
+    // íŒ¨ë”© ê³„ì‚° (BMPëŠ” ê° í–‰ì´ 4ë°”ì´íŠ¸ ê²½ê³„ì— ì •ë ¬ë˜ì–´ì•¼ í•¨)
     int padding = (4 - ((IMAGE_WIDTH * 3) % 4)) % 4;
     int rowSize = IMAGE_WIDTH * 3 + padding;
 
-    // ÀÌ¹ÌÁö µ¥ÀÌÅÍ ¸Ş¸ğ¸® ÇÒ´ç
+    // ì´ë¯¸ì§€ ë°ì´í„° ë©”ëª¨ë¦¬ í• ë‹¹
     RGB* imageData = (RGB*)malloc(IMAGE_WIDTH * IMAGE_HEIGHT * sizeof(RGB));
     if (imageData == NULL) {
-        printf("¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
+        printf("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
         fclose(inFile);
         return 1;
     }
 
-    // ÀÌ¹ÌÁö µ¥ÀÌÅÍ ÀĞ±â (BMP´Â ¾Æ·¡ÂÊºÎÅÍ ÀúÀåµÊ)
+    // ì´ë¯¸ì§€ ë°ì´í„° ì½ê¸° (BMPëŠ” ì•„ë˜ìª½ë¶€í„° ì €ì¥ë¨)
     fseek(inFile, fileHeader.offset, SEEK_SET);
 
     for (int y = IMAGE_HEIGHT - 1; y >= 0; y--) {
         for (int x = 0; x < IMAGE_WIDTH; x++) {
             fread(&imageData[y * IMAGE_WIDTH + x], sizeof(RGB), 1, inFile);
         }
-        // ÆĞµù °Ç³Ê¶Ù±â
+        // íŒ¨ë”© ê±´ë„ˆë›°ê¸°
         fseek(inFile, padding, SEEK_CUR);
     }
 
     fclose(inFile);
 
-    // ±×·¹ÀÌ½ºÄÉÀÏ º¯È¯
+    // ê·¸ë ˆì´ìŠ¤ì¼€ì¼ ë³€í™˜
     uint8_t* grayscaleData = (uint8_t*)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
     if (grayscaleData == NULL) {
-        printf("¸Ş¸ğ¸® ¾Ë´ç ½ÇÆĞ\n");
+        printf("ë©”ëª¨ë¦¬ ì•Œë‹¹ ì‹¤íŒ¨\n");
         free(imageData);
         return 1;
     }
@@ -172,29 +169,29 @@ int main() {
         grayscaleData[i] = rgbToGrayscale(imageData[i]);
     }
 
-    // === (Ãß°¡) ¼Òº§ ¿§Áö °ËÃâ ===
+    // === (ì¶”ê°€) ì†Œë²¨ ì—£ì§€ ê²€ì¶œ ===
     uint8_t* edgeData = (uint8_t*)malloc(IMAGE_WIDTH * IMAGE_HEIGHT);
     if (edgeData == NULL) {
-        printf("¿§Áö µ¥ÀÌÅÍ ¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
+        printf("ì—£ì§€ ë°ì´í„° ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
         free(imageData);
         free(grayscaleData);
         return 1;
     }
     findEdges(grayscaleData, edgeData, IMAGE_WIDTH, IMAGE_HEIGHT);
 
-    // Ãâ·Â ÆÄÀÏ »ı¼º (±×·¹ÀÌ½ºÄÉÀÏ BMP)
+    // ì¶œë ¥ íŒŒì¼ ìƒì„± (ê·¸ë ˆì´ìŠ¤ì¼€ì¼ BMP)
     if (fopen_s(&outFile, outputFile, "wb") != 0 || outFile == NULL) {
-        printf("Ãâ·Â ÆÄÀÏÀ» »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù: %s\n", outputFile);
+        printf("ì¶œë ¥ íŒŒì¼ì„ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤: %s\n", outputFile);
         free(imageData);
         free(grayscaleData);
         free(edgeData);
         return 1;
     }
 
-    // 8ºñÆ® ±×·¹ÀÌ½ºÄÉÀÏ BMP Çì´õ ¼³Á¤
+    // 8ë¹„íŠ¸ ê·¸ë ˆì´ìŠ¤ì¼€ì¼ BMP í—¤ë” ì„¤ì •
     int newPadding = (4 - (IMAGE_WIDTH % 4)) % 4;
     int newRowSize = IMAGE_WIDTH + newPadding;
-    int paletteSize = 256 * 4; // 256»ö ÆÈ·¹Æ® (°¢ Ç×¸ñÀº 4¹ÙÀÌÆ®)
+    int paletteSize = 256 * 4; // 256ìƒ‰ íŒ”ë ˆíŠ¸ (ê° í•­ëª©ì€ 4ë°”ì´íŠ¸)
 
     BMPFileHeader newFileHeader = fileHeader;
     BMPInfoHeader newInfoHeader = infoHeader;
@@ -208,17 +205,17 @@ int main() {
     newInfoHeader.clrImportant = 256;
     newInfoHeader.compression = 0;  // BI_RGB
 
-    // Çì´õ ¾²±â (±×·¹ÀÌ½ºÄÉÀÏ)
+    // í—¤ë” ì“°ê¸° (ê·¸ë ˆì´ìŠ¤ì¼€ì¼)
     fwrite(&newFileHeader, sizeof(BMPFileHeader), 1, outFile);
     fwrite(&newInfoHeader, sizeof(BMPInfoHeader), 1, outFile);
 
-    // ±×·¹ÀÌ½ºÄÉÀÏ ÆÈ·¹Æ® »ı¼º ¹× ¾²±â
+    // ê·¸ë ˆì´ìŠ¤ì¼€ì¼ íŒ”ë ˆíŠ¸ ìƒì„± ë° ì“°ê¸°
     for (int i = 0; i < 256; i++) {
         uint8_t color[4] = { (uint8_t)i, (uint8_t)i, (uint8_t)i, 0 }; // B,G,R,Reserved
         fwrite(color, 4, 1, outFile);
     }
 
-    // ±×·¹ÀÌ½ºÄÉÀÏ ÀÌ¹ÌÁö µ¥ÀÌÅÍ ¾²±â (¾Æ·¡ÂÊºÎÅÍ)
+    // ê·¸ë ˆì´ìŠ¤ì¼€ì¼ ì´ë¯¸ì§€ ë°ì´í„° ì“°ê¸° (ì•„ë˜ìª½ë¶€í„°)
     uint8_t paddingBytes[4] = { 0 };
 
     for (int y = IMAGE_HEIGHT - 1; y >= 0; y--) {
@@ -229,16 +226,16 @@ int main() {
     }
     fclose(outFile);
 
-    // === (Ãß°¡) ¿§Áö BMP ÀúÀå ===
+    // === (ì¶”ê°€) ì—£ì§€ BMP ì €ì¥ ===
     if (fopen_s(&edgeOutFile, edgeFile, "wb") != 0 || edgeOutFile == NULL) {
-        printf("¿§Áö Ãâ·Â ÆÄÀÏÀ» »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù: %s\n", edgeFile);
+        printf("ì—£ì§€ ì¶œë ¥ íŒŒì¼ì„ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤: %s\n", edgeFile);
         free(imageData);
         free(grayscaleData);
         free(edgeData);
         return 1;
     }
 
-    // Çì´õ ¾²±â (¿§Áöµµ µ¿ÀÏ Çì´õ/ÆÈ·¹Æ® »ç¿ë)
+    // í—¤ë” ì“°ê¸° (ì—£ì§€ë„ ë™ì¼ í—¤ë”/íŒ”ë ˆíŠ¸ ì‚¬ìš©)
     fwrite(&newFileHeader, sizeof(BMPFileHeader), 1, edgeOutFile);
     fwrite(&newInfoHeader, sizeof(BMPInfoHeader), 1, edgeOutFile);
 
@@ -255,15 +252,16 @@ int main() {
     }
     fclose(edgeOutFile);
 
-    // ¸Ş¸ğ¸® ÇØÁ¦
+    // ë©”ëª¨ë¦¬ í•´ì œ
     free(imageData);
     free(grayscaleData);
     free(edgeData);
 
-    printf("\nº¯È¯ ¿Ï·á!\n");
-    printf("±×·¹ÀÌ½ºÄÉÀÏ BMP ÆÄÀÏ: %s\n", outputFile);
-    printf("¿§Áö °ËÃâ BMP ÆÄÀÏ: %s\n", edgeFile);
-    printf("±×·¹ÀÌ½ºÄÉÀÏ MEM ÆÄÀÏ: %s\n", memFile);
+    printf("\në³€í™˜ ì™„ë£Œ!\n");
+    printf("ê·¸ë ˆì´ìŠ¤ì¼€ì¼ BMP íŒŒì¼: %s\n", outputFile);
+    printf("ì—£ì§€ ê²€ì¶œ BMP íŒŒì¼: %s\n", edgeFile);
+    printf("ê·¸ë ˆì´ìŠ¤ì¼€ì¼ MEM íŒŒì¼: %s\n", memFile);
 
     return 0;
+
 }
