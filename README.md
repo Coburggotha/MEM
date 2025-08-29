@@ -34,6 +34,53 @@ C:\Users\62>fc image_data.mem image_data2.mem
 
 
 소벨 필터 적용 이미지
+
+
+
+
 ![output_edge.bmp](https://github.com/user-attachments/files/22039110/output_edge.bmp)
 
-소벨 필터 코드
+
+
+소벨 필터 코드를 BMP to Gray 코드에 추가
+
+// 소벨 필터
+int sobelX[3][3] = {
+    {-1, 0, 1},
+    {-2, 0, 2},
+    {-1, 0, 1}
+};
+int sobelY[3][3] = {
+    {-1, -2, -1},
+    { 0,  0,  0},
+    { 1,  2,  1}
+};
+// 안전하게 픽셀 값 가져오기
+unsigned char getPixel(unsigned char* image, int width, int height, int x, int y) {
+    if (x < 0) x = 0;
+    if (x >= width) x = width - 1;
+    if (y < 0) y = 0;
+    if (y >= height) y = height - 1;
+    return image[y * width + x];
+}
+// 소벨 필터로 엣지 찾기
+void findEdges(unsigned char* input, unsigned char* output, int width, int height) {
+    printf("엣지 검출 중...\n");
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int gx = 0, gy = 0;
+            // 주변 9개 픽셀에 필터 적용
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    unsigned char pixel = getPixel(input, width, height, x + j, y + i);
+                    gx += pixel * sobelX[i + 1][j + 1];
+                    gy += pixel * sobelY[i + 1][j + 1];
+                }
+            }
+            // 엣지 강도 계산
+            int edge = (int)sqrt(gx * gx + gy * gy);
+            if (edge > 255) edge = 255;
+            output[y * width + x] = edge;
+        }
+    }
+}
