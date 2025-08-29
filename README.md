@@ -27,7 +27,7 @@ C:\Users\62>fc image_data.mem image_data2.mem
 명령어 이용 두 개의 파일 비교 
 
 
-
+//키보드 방향키 인식 코드 2025.8.29
 
 
 
